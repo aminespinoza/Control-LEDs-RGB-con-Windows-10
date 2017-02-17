@@ -31,5 +31,63 @@ Para armar tu prototipo, lo que debes hacer es seguir el siguiente diagrama (Hec
 
 <img src="imagenes/img01.JPG" width="900" height="480"/>
 
+# El código de Arduino
+
+El proyecto de Arduino se basa en la misma base del proyecto del escritorio luminoso. Pero debido a que el protocolo de comunicación I2C opera de una manera muy diferente al Bluetooth la funcionalidad debe ser adaptada a este nuevo panorama. La estructura del mensaje será la siguiente.
+
+l,r,g,b
+
+Donde:
+
+l = lado o la tira de led que modificará su valor, cuenta con tres valores; l, c, r.
+r = valor del color rojo de la tira de leds asignada, cuenta con valores de 0 a 255.
+g = valor del color verde de la tira de leds asignada, cuenta con valores de 0 a 255.
+b = valor del color azul de la tira de leds asignada, cuenta con valores de 0 a 255.
+
+El flujo de información es simple, después de que el mensaje sea recibido lo primero que procesará es el valor de la tira asignada, después obtendrá los valores de cada color y por último enviados.
+
+```c
+void receiveEvent(int howMany)
+{
+  char pos = (char)Wire.read();
+
+  data = "";
+  while( Wire.available())
+  {
+    data += (char)Wire.read();
+  }
+
+  switch(pos)
+  {
+  case 'l':
+    redLeft = (getStringPartByNr(data, ',', 0)).toInt();
+    greenLeft = (getStringPartByNr(data, ',', 1)).toInt();
+    blueLeft = (getStringPartByNr(data, ',', 2)).toInt();
+    analogWrite(redLightLeft, redLeft);
+    analogWrite(greenLightLeft, greenLeft);
+    analogWrite(blueLightLeft, blueLeft);
+    break;
+
+  case 'c':
+    redCenter = (getStringPartByNr(data, ',', 0)).toInt();
+    greenCenter = (getStringPartByNr(data, ',', 1)).toInt();
+    blueCenter = (getStringPartByNr(data, ',', 2)).toInt();
+    analogWrite(redLightCenter, redCenter);
+    analogWrite(greenLightCenter, greenCenter);
+    analogWrite(blueLightCenter, blueCenter);
+    break;
+
+  case 'r':
+    redRight = (getStringPartByNr(data, ',', 0)).toInt();
+    greenRight = (getStringPartByNr(data, ',', 1)).toInt();
+    blueRight = (getStringPartByNr(data, ',', 2)).toInt();
+    analogWrite(redLightRight, redRight);
+    analogWrite(greenLightRight, greenRight);
+    analogWrite(blueLightRight, blueRight);
+    break;
+  }
+}
+```
+
 Creo que el diagrama es sumamente explícito pero en caso de que tengas alguna duda solo levanta un issue con tu duda y la aclararé tan pronto como pueda.
 
